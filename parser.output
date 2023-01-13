@@ -1,0 +1,181 @@
+Gramatyka
+
+    0 $accept: start $end
+
+    1 start: prog
+
+    2 prog: decl ';' prog
+    3     | decl ';'
+
+    4 decl: ID list
+
+    5 list: ',' ID list
+    6     | ':' type
+
+    7 type: T_INTEGER
+    8     | T_REAL
+
+
+Symbole terminalne i reguły, w których występują
+
+    $end (0) 0
+    ',' (44) 5
+    ':' (58) 6
+    ';' (59) 2 3
+    error (256)
+    T_INTEGER (258) 7
+    T_REAL (259) 8
+    ID (260) 4 5
+
+
+Symbole nieterminalne i reguły, w których występują
+
+    $accept (9)
+        on left: 0
+    start (10)
+        on left: 1
+        on right: 0
+    prog (11)
+        on left: 2 3
+        on right: 1 2
+    decl (12)
+        on left: 4
+        on right: 2 3
+    list (13)
+        on left: 5 6
+        on right: 4 5
+    type (14)
+        on left: 7 8
+        on right: 6
+
+
+Stan 0
+
+    0 $accept: • start $end
+
+    ID  przesunięcie, i przejście do stanu 1
+
+    start  przejście do stanu 2
+    prog   przejście do stanu 3
+    decl   przejście do stanu 4
+
+
+Stan 1
+
+    4 decl: ID • list
+
+    ','  przesunięcie, i przejście do stanu 5
+    ':'  przesunięcie, i przejście do stanu 6
+
+    list  przejście do stanu 7
+
+
+Stan 2
+
+    0 $accept: start • $end
+
+    $end  przesunięcie, i przejście do stanu 8
+
+
+Stan 3
+
+    1 start: prog •
+
+    $domyślnie  redukcja przy użyciu reguły 1 (start)
+
+
+Stan 4
+
+    2 prog: decl • ';' prog
+    3     | decl • ';'
+
+    ';'  przesunięcie, i przejście do stanu 9
+
+
+Stan 5
+
+    5 list: ',' • ID list
+
+    ID  przesunięcie, i przejście do stanu 10
+
+
+Stan 6
+
+    6 list: ':' • type
+
+    T_INTEGER  przesunięcie, i przejście do stanu 11
+    T_REAL     przesunięcie, i przejście do stanu 12
+
+    type  przejście do stanu 13
+
+
+Stan 7
+
+    4 decl: ID list •
+
+    $domyślnie  redukcja przy użyciu reguły 4 (decl)
+
+
+Stan 8
+
+    0 $accept: start $end •
+
+    $domyślnie  akceptowanie
+
+
+Stan 9
+
+    2 prog: decl ';' • prog
+    3     | decl ';' •
+
+    ID  przesunięcie, i przejście do stanu 1
+
+    $domyślnie  redukcja przy użyciu reguły 3 (prog)
+
+    prog  przejście do stanu 14
+    decl  przejście do stanu 4
+
+
+Stan 10
+
+    5 list: ',' ID • list
+
+    ','  przesunięcie, i przejście do stanu 5
+    ':'  przesunięcie, i przejście do stanu 6
+
+    list  przejście do stanu 15
+
+
+Stan 11
+
+    7 type: T_INTEGER •
+
+    $domyślnie  redukcja przy użyciu reguły 7 (type)
+
+
+Stan 12
+
+    8 type: T_REAL •
+
+    $domyślnie  redukcja przy użyciu reguły 8 (type)
+
+
+Stan 13
+
+    6 list: ':' type •
+
+    $domyślnie  redukcja przy użyciu reguły 6 (list)
+
+
+Stan 14
+
+    2 prog: decl ';' prog •
+
+    $domyślnie  redukcja przy użyciu reguły 2 (prog)
+
+
+Stan 15
+
+    5 list: ',' ID list •
+
+    $domyślnie  redukcja przy użyciu reguły 5 (list)

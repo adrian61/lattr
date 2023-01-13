@@ -8,6 +8,7 @@ enum vartype {none, integer, real};
 struct entry {
 string name;
 vartype type;
+u_int32_t address; //zmiena 32 bitowa - obsluga real 8 bajtów
 };
 
 typedef vector<entry> symtable_t;

@@ -1,29 +1,36 @@
 %{
 #include "symtable.h"
+u_int32_t first_free_address = 0;
 %}
 
-%token INT
-%token REAL
+%token T_INTEGER
+%token T_REAL
 %token ID
 
 %%
-start: prog {for(int i=0;i<symtable.size();i++) cout << symtable[i].name<< " " <<symtable[i].type<<endl;};
+start: prog {for(int i=0;i<symtable.size();i++) cout << symtable[i].name<< " " <<symtable[i].type << " " << symtable[i].address <<endl;};
 prog:   decl ';' prog 
      |  decl ';'
-decl:   type list;
-type:   INT  {$$=integer;}
-   |    REAL {$$=real;}
-list:   list ',' ID {symtable[$3].type=(vartype)$0;}
-   |    ID {symtable[$1].type=(vartype)$0;}
+
+decl: ID list {symtable[$1].type=(vartype)$2; symtable[$1].address= first_free_address;
+if( $2 == integer) first_free_address+=4;
+else if ($2 == real) first_free_address+=8;
+else cout << "error";
+
+}
+list: ',' ID list {$$ = $3; symtable[$2].type=(vartype)$3; symtable[$2].address= first_free_address;
+if( $3 == integer) first_free_address+=4;
+else if ($3== real) first_free_address+=8;}
+     | ':' type {$$=$2;}
+type: T_INTEGER {$$ = integer;}
+      | T_REAL {$$ = real;}
 
 %%
-void yyerror(char const *s)
-{
+void yyerror(char const *s) {
   printf("%s\n",s);
 };
 
-int main()
-{
+int main(){
   yyparse();
 };
 

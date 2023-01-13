@@ -1,2 +1,2 @@
-int a,b,c;
-real d,e,f;
+a,b,c: integer;
+d,e,f: real;
