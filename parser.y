@@ -18,7 +18,7 @@ u_int32_t first_free_address = 0;
 start: prog {for(int i=0;i<symtable.size();i++) cout << symtable[i].name<< " " <<symtable[i].type << " " << symtable[i].address <<endl;};
 prog:   decl ';' prog 
      |  decl ';'
-     | s
+     | opt_s
 
 decl: ID list {symtable[$1].type=(vartype)$2; symtable[$1].address= first_free_address;
 if( $2 == integer) first_free_address+=4;
@@ -32,16 +32,17 @@ else if ($3== real) first_free_address+=8;}
      | ':' type {$$=$2;}
 type: T_INTEGER {$$ = integer;}
       | T_REAL {$$ = real;}
-
+opt_s: s
+    | opt_s ';' s
 s: ID T_ASSIGN e {emit("id.place ':=' E.place");}
 e: e '+' e {/*E.place = newtemp; */
             emit("id.place ':=' E1.place '+' E2.place");}
     | e '*' e {/*E.place = newtemp; */
                 emit("id.place ':=' E1.place '*' E2.place");}
-    | e: '-' e {/*E.place = newtemp; */
+    | '-' e {/*E.place = newtemp; */
                 emit("id.place 'uminus' E1.place");}
-    | e: '(' e ')' {emit("();");/*E.place = E1.place; */}
-    | e: ID  {emit("id");/*E.place:=id.place;*/}
+    | '(' e ')' {emit("();");/*E.place = E1.place; */}
+    | ID  {emit("id");/*E.place:=id.place;*/}
 
 
 
