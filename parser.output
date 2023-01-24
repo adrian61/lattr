@@ -1,4 +1,4 @@
-Gramatyka
+Grammar
 
     0 $accept: start $end
 
@@ -16,7 +16,7 @@ Gramatyka
     8     | T_REAL
 
 
-Symbole terminalne i reguły, w których występują
+Terminals, with rules where they appear
 
     $end (0) 0
     ',' (44) 5
@@ -28,7 +28,7 @@ Symbole terminalne i reguły, w których występują
     ID (260) 4 5
 
 
-Symbole nieterminalne i reguły, w których występują
+Nonterminals, with rules where they appear
 
     $accept (9)
         on left: 0
@@ -49,133 +49,133 @@ Symbole nieterminalne i reguły, w których występują
         on right: 6
 
 
-Stan 0
+State 0
 
-    0 $accept: • start $end
+    0 $accept: . start $end
 
-    ID  przesunięcie, i przejście do stanu 1
+    ID  shift, and go to state 1
 
-    start  przejście do stanu 2
-    prog   przejście do stanu 3
-    decl   przejście do stanu 4
+    start  go to state 2
+    prog   go to state 3
+    decl   go to state 4
 
 
-Stan 1
+State 1
 
-    4 decl: ID • list
+    4 decl: ID . list
 
-    ','  przesunięcie, i przejście do stanu 5
-    ':'  przesunięcie, i przejście do stanu 6
+    ','  shift, and go to state 5
+    ':'  shift, and go to state 6
 
-    list  przejście do stanu 7
+    list  go to state 7
 
 
-Stan 2
+State 2
 
-    0 $accept: start • $end
+    0 $accept: start . $end
 
-    $end  przesunięcie, i przejście do stanu 8
+    $end  shift, and go to state 8
 
 
-Stan 3
+State 3
 
-    1 start: prog •
+    1 start: prog .
 
-    $domyślnie  redukcja przy użyciu reguły 1 (start)
+    $default  reduce using rule 1 (start)
 
 
-Stan 4
+State 4
 
-    2 prog: decl • ';' prog
-    3     | decl • ';'
+    2 prog: decl . ';' prog
+    3     | decl . ';'
 
-    ';'  przesunięcie, i przejście do stanu 9
+    ';'  shift, and go to state 9
 
 
-Stan 5
+State 5
 
-    5 list: ',' • ID list
+    5 list: ',' . ID list
 
-    ID  przesunięcie, i przejście do stanu 10
+    ID  shift, and go to state 10
 
 
-Stan 6
+State 6
 
-    6 list: ':' • type
+    6 list: ':' . type
 
-    T_INTEGER  przesunięcie, i przejście do stanu 11
-    T_REAL     przesunięcie, i przejście do stanu 12
+    T_INTEGER  shift, and go to state 11
+    T_REAL     shift, and go to state 12
 
-    type  przejście do stanu 13
+    type  go to state 13
 
 
-Stan 7
+State 7
 
-    4 decl: ID list •
+    4 decl: ID list .
 
-    $domyślnie  redukcja przy użyciu reguły 4 (decl)
+    $default  reduce using rule 4 (decl)
 
 
-Stan 8
+State 8
 
-    0 $accept: start $end •
+    0 $accept: start $end .
 
-    $domyślnie  akceptowanie
+    $default  accept
 
 
-Stan 9
+State 9
 
-    2 prog: decl ';' • prog
-    3     | decl ';' •
+    2 prog: decl ';' . prog
+    3     | decl ';' .
 
-    ID  przesunięcie, i przejście do stanu 1
+    ID  shift, and go to state 1
 
-    $domyślnie  redukcja przy użyciu reguły 3 (prog)
+    $default  reduce using rule 3 (prog)
 
-    prog  przejście do stanu 14
-    decl  przejście do stanu 4
+    prog  go to state 14
+    decl  go to state 4
 
 
-Stan 10
+State 10
 
-    5 list: ',' ID • list
+    5 list: ',' ID . list
 
-    ','  przesunięcie, i przejście do stanu 5
-    ':'  przesunięcie, i przejście do stanu 6
+    ','  shift, and go to state 5
+    ':'  shift, and go to state 6
 
-    list  przejście do stanu 15
+    list  go to state 15
 
 
-Stan 11
+State 11
 
-    7 type: T_INTEGER •
+    7 type: T_INTEGER .
 
-    $domyślnie  redukcja przy użyciu reguły 7 (type)
+    $default  reduce using rule 7 (type)
 
 
-Stan 12
+State 12
 
-    8 type: T_REAL •
+    8 type: T_REAL .
 
-    $domyślnie  redukcja przy użyciu reguły 8 (type)
+    $default  reduce using rule 8 (type)
 
 
-Stan 13
+State 13
 
-    6 list: ':' type •
+    6 list: ':' type .
 
-    $domyślnie  redukcja przy użyciu reguły 6 (list)
+    $default  reduce using rule 6 (list)
 
 
-Stan 14
+State 14
 
-    2 prog: decl ';' prog •
+    2 prog: decl ';' prog .
 
-    $domyślnie  redukcja przy użyciu reguły 2 (prog)
+    $default  reduce using rule 2 (prog)
 
 
-Stan 15
+State 15
 
-    5 list: ',' ID list •
+    5 list: ',' ID list .
 
-    $domyślnie  redukcja przy użyciu reguły 5 (list)
+    $default  reduce using rule 5 (list)

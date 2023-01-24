@@ -25,6 +25,18 @@ else if ($3== real) first_free_address+=8;}
 type: T_INTEGER {$$ = integer;}
       | T_REAL {$$ = real;}
 
+S: ID ':=' E {emit("id.place ':=' E.place");}
+E: E '+' E {/*E.place = newtemp; */
+  emit("id.place ':=' E1.place '+' E2.place");}
+E: E '*' E {/*E.place = newtemp; */
+  emit("id.place ':=' E1.place '*' E2.place");}
+E: '-' E {/*E.place = newtemp; */
+  emit("id.place 'uminus' E1.place");}
+E: ( E ) {/*E.place = E1.place; */}
+E: ID  {/*E.place:=id.place;k*/}
+
+
+
 %%
 void yyerror(char const *s) {
   printf("%s\n",s);
@@ -57,3 +69,7 @@ for(i=0;i<symtable.size();i++)
     return i;
 return -1;
 };
+
+void emit(string s){
+cout << s ;
+}
