@@ -1,4 +1,10 @@
 %{
+// obsluzyc instrukcje write
+// oprocz id, liczby w tablicy symboli, czyli pole okreslajace, co jest przechowywane w tablicy symboli
+// emit gdy cos jest zmienna to tryb adresowania bezposredniego, gdy stala liczba tryb adresowania natychmiastowego (czyli z #)
+// gencode( const string *mnemonic, int index_var1, int index_var2, int index_var3);
+// funkcja okresla typ - nie musi, bo wszystko ma byc integer
+#include "global.h"
 #include "symtable.h"
 u_int32_t first_free_address = 0;
 %}
@@ -6,11 +12,13 @@ u_int32_t first_free_address = 0;
 %token T_INTEGER
 %token T_REAL
 %token ID
+%token T_ASSIGN
 
 %%
 start: prog {for(int i=0;i<symtable.size();i++) cout << symtable[i].name<< " " <<symtable[i].type << " " << symtable[i].address <<endl;};
 prog:   decl ';' prog 
      |  decl ';'
+     | s
 
 decl: ID list {symtable[$1].type=(vartype)$2; symtable[$1].address= first_free_address;
 if( $2 == integer) first_free_address+=4;
@@ -25,15 +33,15 @@ else if ($3== real) first_free_address+=8;}
 type: T_INTEGER {$$ = integer;}
       | T_REAL {$$ = real;}
 
-S: ID ':=' E {emit("id.place ':=' E.place");}
-E: E '+' E {/*E.place = newtemp; */
-  emit("id.place ':=' E1.place '+' E2.place");}
-E: E '*' E {/*E.place = newtemp; */
-  emit("id.place ':=' E1.place '*' E2.place");}
-E: '-' E {/*E.place = newtemp; */
-  emit("id.place 'uminus' E1.place");}
-E: ( E ) {/*E.place = E1.place; */}
-E: ID  {/*E.place:=id.place;k*/}
+s: ID T_ASSIGN e {emit("id.place ':=' E.place");}
+e: e '+' e {/*E.place = newtemp; */
+            emit("id.place ':=' E1.place '+' E2.place");}
+    | e '*' e {/*E.place = newtemp; */
+                emit("id.place ':=' E1.place '*' E2.place");}
+    | e: '-' e {/*E.place = newtemp; */
+                emit("id.place 'uminus' E1.place");}
+    | e: '(' e ')' {emit("();");/*E.place = E1.place; */}
+    | e: ID  {emit("id");/*E.place:=id.place;*/}
 
 
 
@@ -41,6 +49,10 @@ E: ID  {/*E.place:=id.place;k*/}
 void yyerror(char const *s) {
   printf("%s\n",s);
 };
+
+void emit(string s){
+cout << s << endl;
+}
 
 int main(){
   yyparse();
@@ -70,6 +82,4 @@ for(i=0;i<symtable.size();i++)
 return -1;
 };
 
-void emit(string s){
-cout << s ;
-}
+

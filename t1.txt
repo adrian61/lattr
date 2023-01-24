@@ -1,2 +1,3 @@
 a,b,c: integer;
 d,e,f: real;
+d:=b+c

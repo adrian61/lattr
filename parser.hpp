@@ -51,7 +51,8 @@ extern int yydebug;
   {
     T_INTEGER = 258,
     T_REAL = 259,
-    ID = 260
+    ID = 260,
+    T_ASSIGN = 261
   };
 #endif
 

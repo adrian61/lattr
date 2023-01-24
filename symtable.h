@@ -18,5 +18,3 @@ extern symtable_t symtable;
 int addtotable(const string& s);
 int findintable(const string& s);
 
-int yylex();
-void yyerror(char const *);

@@ -1,3 +1,19 @@
+Rules useless in parser due to conflicts
+
+   15 e: %empty
+   17  | %empty
+
+
+State 6 conflicts: 6 reduce/reduce
+State 13 conflicts: 8 reduce/reduce
+State 14 conflicts: 6 reduce/reduce
+State 21 conflicts: 2 shift/reduce
+State 23 conflicts: 8 reduce/reduce
+State 24 conflicts: 8 reduce/reduce
+State 27 conflicts: 2 shift/reduce
+State 28 conflicts: 2 shift/reduce
+
+
 Grammar
 
     0 $accept: start $end
@@ -6,47 +22,71 @@ Grammar
 
     2 prog: decl ';' prog
     3     | decl ';'
+    4     | s
 
-    4 decl: ID list
+    5 decl: ID list
 
-    5 list: ',' ID list
-    6     | ':' type
+    6 list: ',' ID list
+    7     | ':' type
 
-    7 type: T_INTEGER
-    8     | T_REAL
+    8 type: T_INTEGER
+    9     | T_REAL
+
+   10 s: ID T_ASSIGN e
+
+   11 e: e '+' e
+   12  | e '*' e
+   13  | %empty
+   14  | '-' e
+   15  | %empty
+   16  | '(' e ')'
+   17  | %empty
+   18  | ID
 
 
 Terminals, with rules where they appear
 
     $end (0) 0
-    ',' (44) 5
-    ':' (58) 6
+    '(' (40) 16
+    ')' (41) 16
+    '*' (42) 12
+    '+' (43) 11
+    ',' (44) 6
+    '-' (45) 14
+    ':' (58) 7
     ';' (59) 2 3
     error (256)
-    T_INTEGER (258) 7
-    T_REAL (259) 8
-    ID (260) 4 5
+    T_INTEGER (258) 8
+    T_REAL (259) 9
+    ID (260) 5 6 10 18
+    T_ASSIGN (261) 10
 
 
 Nonterminals, with rules where they appear
 
-    $accept (9)
+    $accept (15)
         on left: 0
-    start (10)
+    start (16)
         on left: 1
         on right: 0
-    prog (11)
-        on left: 2 3
+    prog (17)
+        on left: 2 3 4
         on right: 1 2
-    decl (12)
-        on left: 4
+    decl (18)
+        on left: 5
         on right: 2 3
-    list (13)
-        on left: 5 6
-        on right: 4 5
-    type (14)
-        on left: 7 8
-        on right: 6
+    list (19)
+        on left: 6 7
+        on right: 5 6
+    type (20)
+        on left: 8 9
+        on right: 7
+    s (21)
+        on left: 10
+        on right: 4
+    e (22)
+        on left: 11 12 13 14 15 16 17 18
+        on right: 10 11 12 14 16
 
 
 State 0
@@ -58,23 +98,26 @@ State 0
     start  go to state 2
     prog   go to state 3
     decl   go to state 4
+    s      go to state 5
 
 
 State 1
 
-    4 decl: ID . list
+    5 decl: ID . list
+   10 s: ID . T_ASSIGN e
 
-    ','  shift, and go to state 5
-    ':'  shift, and go to state 6
+    T_ASSIGN  shift, and go to state 6
+    ','       shift, and go to state 7
+    ':'       shift, and go to state 8
 
-    list  go to state 7
+    list  go to state 9
 
 
 State 2
 
     0 $accept: start . $end
 
-    $end  shift, and go to state 8
+    $end  shift, and go to state 10
 
 
 State 3
@@ -89,41 +132,70 @@ State 4
     2 prog: decl . ';' prog
     3     | decl . ';'
 
-    ';'  shift, and go to state 9
+    ';'  shift, and go to state 11
 
 
 State 5
 
-    5 list: ',' . ID list
+    4 prog: s .
 
-    ID  shift, and go to state 10
+    $default  reduce using rule 4 (prog)
 
 
 State 6
 
-    6 list: ':' . type
+   10 s: ID T_ASSIGN . e
 
-    T_INTEGER  shift, and go to state 11
-    T_REAL     shift, and go to state 12
+    ID   shift, and go to state 12
+    '-'  shift, and go to state 13
+    '('  shift, and go to state 14
 
-    type  go to state 13
+    $end      reduce using rule 13 (e)
+    $end      [reduce using rule 15 (e)]
+    $end      [reduce using rule 17 (e)]
+    '+'       reduce using rule 13 (e)
+    '+'       [reduce using rule 15 (e)]
+    '+'       [reduce using rule 17 (e)]
+    '*'       reduce using rule 13 (e)
+    '*'       [reduce using rule 15 (e)]
+    '*'       [reduce using rule 17 (e)]
+    $default  reduce using rule 13 (e)
+
+    e  go to state 15
 
 
 State 7
 
-    4 decl: ID list .
+    6 list: ',' . ID list
 
-    $default  reduce using rule 4 (decl)
+    ID  shift, and go to state 16
 
 
 State 8
+
+    7 list: ':' . type
+
+    T_INTEGER  shift, and go to state 17
+    T_REAL     shift, and go to state 18
+
+    type  go to state 19
+
+
+State 9
+
+    5 decl: ID list .
+
+    $default  reduce using rule 5 (decl)
+
+
+State 10
 
     0 $accept: start $end .
 
     $default  accept
 
 
-State 9
+State 11
 
     2 prog: decl ';' . prog
     3     | decl ';' .
@@ -132,50 +204,227 @@ State 9
 
     $default  reduce using rule 3 (prog)
 
-    prog  go to state 14
+    prog  go to state 20
     decl  go to state 4
-
-
-State 10
-
-    5 list: ',' ID . list
-
-    ','  shift, and go to state 5
-    ':'  shift, and go to state 6
-
-    list  go to state 15
-
-
-State 11
-
-    7 type: T_INTEGER .
-
-    $default  reduce using rule 7 (type)
+    s     go to state 5
 
 
 State 12
 
-    8 type: T_REAL .
+   18 e: ID .
 
-    $default  reduce using rule 8 (type)
+    $default  reduce using rule 18 (e)
 
 
 State 13
 
-    6 list: ':' type .
+   14 e: '-' . e
 
-    $default  reduce using rule 6 (list)
+    ID   shift, and go to state 12
+    '-'  shift, and go to state 13
+    '('  shift, and go to state 14
+
+    $end      reduce using rule 13 (e)
+    $end      [reduce using rule 15 (e)]
+    $end      [reduce using rule 17 (e)]
+    '+'       reduce using rule 13 (e)
+    '+'       [reduce using rule 15 (e)]
+    '+'       [reduce using rule 17 (e)]
+    '*'       reduce using rule 13 (e)
+    '*'       [reduce using rule 15 (e)]
+    '*'       [reduce using rule 17 (e)]
+    ')'       reduce using rule 13 (e)
+    ')'       [reduce using rule 15 (e)]
+    ')'       [reduce using rule 17 (e)]
+    $default  reduce using rule 13 (e)
+
+    e  go to state 21
 
 
 State 14
+
+   16 e: '(' . e ')'
+
+    ID   shift, and go to state 12
+    '-'  shift, and go to state 13
+    '('  shift, and go to state 14
+
+    '+'       reduce using rule 13 (e)
+    '+'       [reduce using rule 15 (e)]
+    '+'       [reduce using rule 17 (e)]
+    '*'       reduce using rule 13 (e)
+    '*'       [reduce using rule 15 (e)]
+    '*'       [reduce using rule 17 (e)]
+    ')'       reduce using rule 13 (e)
+    ')'       [reduce using rule 15 (e)]
+    ')'       [reduce using rule 17 (e)]
+    $default  reduce using rule 13 (e)
+
+    e  go to state 22
+
+
+State 15
+
+   10 s: ID T_ASSIGN e .
+   11 e: e . '+' e
+   12  | e . '*' e
+
+    '+'  shift, and go to state 23
+    '*'  shift, and go to state 24
+
+    $default  reduce using rule 10 (s)
+
+
+State 16
+
+    6 list: ',' ID . list
+
+    ','  shift, and go to state 7
+    ':'  shift, and go to state 8
+
+    list  go to state 25
+
+
+State 17
+
+    8 type: T_INTEGER .
+
+    $default  reduce using rule 8 (type)
+
+
+State 18
+
+    9 type: T_REAL .
+
+    $default  reduce using rule 9 (type)
+
+
+State 19
+
+    7 list: ':' type .
+
+    $default  reduce using rule 7 (list)
+
+
+State 20
 
     2 prog: decl ';' prog .
 
     $default  reduce using rule 2 (prog)
 
 
-State 15
+State 21
 
-    5 list: ',' ID list .
+   11 e: e . '+' e
+   12  | e . '*' e
+   14  | '-' e .
 
-    $default  reduce using rule 5 (list)
+    '+'  shift, and go to state 23
+    '*'  shift, and go to state 24
+
+    '+'       [reduce using rule 14 (e)]
+    '*'       [reduce using rule 14 (e)]
+    $default  reduce using rule 14 (e)
+
+
+State 22
+
+   11 e: e . '+' e
+   12  | e . '*' e
+   16  | '(' e . ')'
+
+    '+'  shift, and go to state 23
+    '*'  shift, and go to state 24
+    ')'  shift, and go to state 26
+
+
+State 23
+
+   11 e: e '+' . e
+
+    ID   shift, and go to state 12
+    '-'  shift, and go to state 13
+    '('  shift, and go to state 14
+
+    $end      reduce using rule 13 (e)
+    $end      [reduce using rule 15 (e)]
+    $end      [reduce using rule 17 (e)]
+    '+'       reduce using rule 13 (e)
+    '+'       [reduce using rule 15 (e)]
+    '+'       [reduce using rule 17 (e)]
+    '*'       reduce using rule 13 (e)
+    '*'       [reduce using rule 15 (e)]
+    '*'       [reduce using rule 17 (e)]
+    ')'       reduce using rule 13 (e)
+    ')'       [reduce using rule 15 (e)]
+    ')'       [reduce using rule 17 (e)]
+    $default  reduce using rule 13 (e)
+
+    e  go to state 27
+
+
+State 24
+
+   12 e: e '*' . e
+
+    ID   shift, and go to state 12
+    '-'  shift, and go to state 13
+    '('  shift, and go to state 14
+
+    $end      reduce using rule 13 (e)
+    $end      [reduce using rule 15 (e)]
+    $end      [reduce using rule 17 (e)]
+    '+'       reduce using rule 13 (e)
+    '+'       [reduce using rule 15 (e)]
+    '+'       [reduce using rule 17 (e)]
+    '*'       reduce using rule 13 (e)
+    '*'       [reduce using rule 15 (e)]
+    '*'       [reduce using rule 17 (e)]
+    ')'       reduce using rule 13 (e)
+    ')'       [reduce using rule 15 (e)]
+    ')'       [reduce using rule 17 (e)]
+    $default  reduce using rule 13 (e)
+
+    e  go to state 28
+
+
+State 25
+
+    6 list: ',' ID list .
+
+    $default  reduce using rule 6 (list)
+
+
+State 26
+
+   16 e: '(' e ')' .
+
+    $default  reduce using rule 16 (e)
+
+
+State 27
+
+   11 e: e . '+' e
+   11  | e '+' e .
+   12  | e . '*' e
+
+    '+'  shift, and go to state 23
+    '*'  shift, and go to state 24
+
+    '+'       [reduce using rule 11 (e)]
+    '*'       [reduce using rule 11 (e)]
+    $default  reduce using rule 11 (e)
+
+
+State 28
+
+   11 e: e . '+' e
+   12  | e . '*' e
+   12  | e '*' e .
+
+    '+'  shift, and go to state 23
+    '*'  shift, and go to state 24
+
+    '+'       [reduce using rule 12 (e)]
+    '*'       [reduce using rule 12 (e)]
+    $default  reduce using rule 12 (e)
