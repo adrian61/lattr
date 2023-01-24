@@ -1,4 +1,2 @@
-a,b,c: integer;
-d,e,f: real;
-d:=b+c;
-a:=e*d;
+a, b, c: integer;
+d:=-a;
