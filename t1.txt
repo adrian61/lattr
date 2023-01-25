@@ -1,2 +1,7 @@
-a, b, cd : integer;
-d:=a*b;
+program example(input, output);
+var x, y: integer;
+begin
+x:= y*x; 
+a:= a100;
+b:= d;
+end.

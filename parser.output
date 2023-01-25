@@ -1,394 +1,493 @@
-State 25 conflicts: 2 shift/reduce
-State 31 conflicts: 2 shift/reduce
-State 32 conflicts: 2 shift/reduce
+Stan 38 konflikty: 2 przesunięcie/redukcja
+Stan 42 konflikty: 2 przesunięcie/redukcja
+Stan 43 konflikty: 2 przesunięcie/redukcja
 
 
-Grammar
+Gramatyka
 
     0 $accept: start $end
 
-    1 start: prog
+    1 start: program
 
-    2 prog: decl ';' prog
-    3     | decl ';'
-    4     | opt_s ';'
+    2 $@1: ε
 
-    5 decl: ID list
+    3 program: T_PROGRAM ID '(' identifier_list ')' ';' declarations $@1 compound_statement
 
-    6 list: ',' ID list
-    7     | ':' type
+    4 identifier_list: ID
+    5                | identifier_list ',' ID
+
+    6 declarations: declarations T_VAR identifier_list ':' type ';'
+    7             | ε
 
     8 type: T_INTEGER
     9     | T_REAL
 
-   10 opt_s: s
-   11      | opt_s ';' s
+   10 compound_statement: T_BEGIN optional_statements T_END '.'
 
-   12 s: ID T_ASSIGN e
+   11 optional_statements: statement_list
+   12                    | ε
 
-   13 e: e '+' e
-   14  | e '*' e
-   15  | '-' e
-   16  | '(' e ')'
-   17  | ID
+   13 statement_list: statement
+   14               | statement_list ';' statement
+
+   15 statement: ID T_ASSIGN e
+
+   16 e: e '+' e
+   17  | e '*' e
+   18  | '-' e
+   19  | '(' e ')'
+   20  | ID
 
 
-Terminals, with rules where they appear
+Symbole terminalne i reguły, w których występują
 
     $end (0) 0
-    '(' (40) 16
-    ')' (41) 16
-    '*' (42) 14
-    '+' (43) 13
-    ',' (44) 6
-    '-' (45) 15
-    ':' (58) 7
-    ';' (59) 2 3 4 11
+    '(' (40) 3 19
+    ')' (41) 3 19
+    '*' (42) 17
+    '+' (43) 16
+    ',' (44) 5
+    '-' (45) 18
+    '.' (46) 10
+    ':' (58) 6
+    ';' (59) 3 6 14
     error (256)
     T_INTEGER (258) 8
     T_REAL (259) 9
-    ID (260) 5 6 12 17
-    T_ASSIGN (261) 12
+    ID (260) 3 4 5 15 20
+    T_ASSIGN (261) 15
+    T_PROGRAM (262) 3
+    T_VAR (263) 6
+    T_BEGIN (264) 10
+    T_END (265) 10
 
 
-Nonterminals, with rules where they appear
+Symbole nieterminalne i reguły, w których występują
 
-    $accept (15)
+    $accept (20)
         on left: 0
-    start (16)
+    start (21)
         on left: 1
         on right: 0
-    prog (17)
-        on left: 2 3 4
-        on right: 1 2
-    decl (18)
-        on left: 5
-        on right: 2 3
-    list (19)
+    program (22)
+        on left: 3
+        on right: 1
+    $@1 (23)
+        on left: 2
+        on right: 3
+    identifier_list (24)
+        on left: 4 5
+        on right: 3 5 6
+    declarations (25)
         on left: 6 7
-        on right: 5 6
-    type (20)
+        on right: 3 6
+    type (26)
         on left: 8 9
-        on right: 7
-    opt_s (21)
-        on left: 10 11
-        on right: 4 11
-    s (22)
-        on left: 12
-        on right: 10 11
-    e (23)
-        on left: 13 14 15 16 17
-        on right: 12 13 14 15 16
+        on right: 6
+    compound_statement (27)
+        on left: 10
+        on right: 3
+    optional_statements (28)
+        on left: 11 12
+        on right: 10
+    statement_list (29)
+        on left: 13 14
+        on right: 11 14
+    statement (30)
+        on left: 15
+        on right: 13 14
+    e (31)
+        on left: 16 17 18 19 20
+        on right: 15 16 17 18 19
 
 
-State 0
+Stan 0
 
-    0 $accept: . start $end
+    0 $accept: • start $end
 
-    ID  shift, and go to state 1
+    T_PROGRAM  przesunięcie, i przejście do stanu 1
 
-    start  go to state 2
-    prog   go to state 3
-    decl   go to state 4
-    opt_s  go to state 5
-    s      go to state 6
+    start    przejście do stanu 2
+    program  przejście do stanu 3
 
 
-State 1
+Stan 1
 
-    5 decl: ID . list
-   12 s: ID . T_ASSIGN e
+    3 program: T_PROGRAM • ID '(' identifier_list ')' ';' declarations $@1 compound_statement
 
-    T_ASSIGN  shift, and go to state 7
-    ','       shift, and go to state 8
-    ':'       shift, and go to state 9
+    ID  przesunięcie, i przejście do stanu 4
 
-    list  go to state 10
 
+Stan 2
 
-State 2
+    0 $accept: start • $end
 
-    0 $accept: start . $end
+    $end  przesunięcie, i przejście do stanu 5
 
-    $end  shift, and go to state 11
 
+Stan 3
 
-State 3
+    1 start: program •
 
-    1 start: prog .
+    $domyślnie  redukcja przy użyciu reguły 1 (start)
 
-    $default  reduce using rule 1 (start)
 
+Stan 4
 
-State 4
+    3 program: T_PROGRAM ID • '(' identifier_list ')' ';' declarations $@1 compound_statement
 
-    2 prog: decl . ';' prog
-    3     | decl . ';'
+    '('  przesunięcie, i przejście do stanu 6
 
-    ';'  shift, and go to state 12
 
+Stan 5
 
-State 5
+    0 $accept: start $end •
 
-    4 prog: opt_s . ';'
-   11 opt_s: opt_s . ';' s
+    $domyślnie  akceptowanie
 
-    ';'  shift, and go to state 13
 
+Stan 6
 
-State 6
+    3 program: T_PROGRAM ID '(' • identifier_list ')' ';' declarations $@1 compound_statement
 
-   10 opt_s: s .
+    ID  przesunięcie, i przejście do stanu 7
 
-    $default  reduce using rule 10 (opt_s)
+    identifier_list  przejście do stanu 8
 
 
-State 7
+Stan 7
 
-   12 s: ID T_ASSIGN . e
+    4 identifier_list: ID •
 
-    ID   shift, and go to state 14
-    '-'  shift, and go to state 15
-    '('  shift, and go to state 16
+    $domyślnie  redukcja przy użyciu reguły 4 (identifier_list)
 
-    e  go to state 17
 
+Stan 8
 
-State 8
+    3 program: T_PROGRAM ID '(' identifier_list • ')' ';' declarations $@1 compound_statement
+    5 identifier_list: identifier_list • ',' ID
 
-    6 list: ',' . ID list
+    ')'  przesunięcie, i przejście do stanu 9
+    ','  przesunięcie, i przejście do stanu 10
 
-    ID  shift, and go to state 18
 
+Stan 9
 
-State 9
+    3 program: T_PROGRAM ID '(' identifier_list ')' • ';' declarations $@1 compound_statement
 
-    7 list: ':' . type
+    ';'  przesunięcie, i przejście do stanu 11
 
-    T_INTEGER  shift, and go to state 19
-    T_REAL     shift, and go to state 20
 
-    type  go to state 21
+Stan 10
 
+    5 identifier_list: identifier_list ',' • ID
 
-State 10
+    ID  przesunięcie, i przejście do stanu 12
 
-    5 decl: ID list .
 
-    $default  reduce using rule 5 (decl)
+Stan 11
 
+    3 program: T_PROGRAM ID '(' identifier_list ')' ';' • declarations $@1 compound_statement
 
-State 11
+    $domyślnie  redukcja przy użyciu reguły 7 (declarations)
 
-    0 $accept: start $end .
+    declarations  przejście do stanu 13
 
-    $default  accept
 
+Stan 12
 
-State 12
+    5 identifier_list: identifier_list ',' ID •
 
-    2 prog: decl ';' . prog
-    3     | decl ';' .
+    $domyślnie  redukcja przy użyciu reguły 5 (identifier_list)
 
-    ID  shift, and go to state 1
 
-    $default  reduce using rule 3 (prog)
+Stan 13
 
-    prog   go to state 22
-    decl   go to state 4
-    opt_s  go to state 5
-    s      go to state 6
+    3 program: T_PROGRAM ID '(' identifier_list ')' ';' declarations • $@1 compound_statement
+    6 declarations: declarations • T_VAR identifier_list ':' type ';'
 
+    T_VAR  przesunięcie, i przejście do stanu 14
 
-State 13
+    $domyślnie  redukcja przy użyciu reguły 2 ($@1)
 
-    4 prog: opt_s ';' .
-   11 opt_s: opt_s ';' . s
+    $@1  przejście do stanu 15
 
-    ID  shift, and go to state 23
 
-    $default  reduce using rule 4 (prog)
+Stan 14
 
-    s  go to state 24
+    6 declarations: declarations T_VAR • identifier_list ':' type ';'
 
+    ID  przesunięcie, i przejście do stanu 7
 
-State 14
+    identifier_list  przejście do stanu 16
 
-   17 e: ID .
 
-    $default  reduce using rule 17 (e)
+Stan 15
 
+    3 program: T_PROGRAM ID '(' identifier_list ')' ';' declarations $@1 • compound_statement
 
-State 15
+    T_BEGIN  przesunięcie, i przejście do stanu 17
 
-   15 e: '-' . e
+    compound_statement  przejście do stanu 18
 
-    ID   shift, and go to state 14
-    '-'  shift, and go to state 15
-    '('  shift, and go to state 16
 
-    e  go to state 25
+Stan 16
 
+    5 identifier_list: identifier_list • ',' ID
+    6 declarations: declarations T_VAR identifier_list • ':' type ';'
 
-State 16
+    ','  przesunięcie, i przejście do stanu 10
+    ':'  przesunięcie, i przejście do stanu 19
 
-   16 e: '(' . e ')'
 
-    ID   shift, and go to state 14
-    '-'  shift, and go to state 15
-    '('  shift, and go to state 16
+Stan 17
 
-    e  go to state 26
+   10 compound_statement: T_BEGIN • optional_statements T_END '.'
 
+    ID  przesunięcie, i przejście do stanu 20
 
-State 17
+    $domyślnie  redukcja przy użyciu reguły 12 (optional_statements)
 
-   12 s: ID T_ASSIGN e .
-   13 e: e . '+' e
-   14  | e . '*' e
+    optional_statements  przejście do stanu 21
+    statement_list       przejście do stanu 22
+    statement            przejście do stanu 23
 
-    '+'  shift, and go to state 27
-    '*'  shift, and go to state 28
 
-    $default  reduce using rule 12 (s)
+Stan 18
 
+    3 program: T_PROGRAM ID '(' identifier_list ')' ';' declarations $@1 compound_statement •
 
-State 18
+    $domyślnie  redukcja przy użyciu reguły 3 (program)
 
-    6 list: ',' ID . list
 
-    ','  shift, and go to state 8
-    ':'  shift, and go to state 9
+Stan 19
 
-    list  go to state 29
+    6 declarations: declarations T_VAR identifier_list ':' • type ';'
 
+    T_INTEGER  przesunięcie, i przejście do stanu 24
+    T_REAL     przesunięcie, i przejście do stanu 25
 
-State 19
+    type  przejście do stanu 26
 
-    8 type: T_INTEGER .
 
-    $default  reduce using rule 8 (type)
+Stan 20
 
+   15 statement: ID • T_ASSIGN e
 
-State 20
+    T_ASSIGN  przesunięcie, i przejście do stanu 27
 
-    9 type: T_REAL .
 
-    $default  reduce using rule 9 (type)
+Stan 21
 
+   10 compound_statement: T_BEGIN optional_statements • T_END '.'
 
-State 21
+    T_END  przesunięcie, i przejście do stanu 28
 
-    7 list: ':' type .
 
-    $default  reduce using rule 7 (list)
+Stan 22
 
+   11 optional_statements: statement_list •
+   14 statement_list: statement_list • ';' statement
 
-State 22
+    ';'  przesunięcie, i przejście do stanu 29
 
-    2 prog: decl ';' prog .
+    $domyślnie  redukcja przy użyciu reguły 11 (optional_statements)
 
-    $default  reduce using rule 2 (prog)
 
+Stan 23
 
-State 23
+   13 statement_list: statement •
 
-   12 s: ID . T_ASSIGN e
+    $domyślnie  redukcja przy użyciu reguły 13 (statement_list)
 
-    T_ASSIGN  shift, and go to state 7
 
+Stan 24
 
-State 24
+    8 type: T_INTEGER •
 
-   11 opt_s: opt_s ';' s .
+    $domyślnie  redukcja przy użyciu reguły 8 (type)
 
-    $default  reduce using rule 11 (opt_s)
 
+Stan 25
 
-State 25
+    9 type: T_REAL •
 
-   13 e: e . '+' e
-   14  | e . '*' e
-   15  | '-' e .
+    $domyślnie  redukcja przy użyciu reguły 9 (type)
 
-    '+'  shift, and go to state 27
-    '*'  shift, and go to state 28
 
-    '+'       [reduce using rule 15 (e)]
-    '*'       [reduce using rule 15 (e)]
-    $default  reduce using rule 15 (e)
+Stan 26
 
+    6 declarations: declarations T_VAR identifier_list ':' type • ';'
 
-State 26
+    ';'  przesunięcie, i przejście do stanu 30
 
-   13 e: e . '+' e
-   14  | e . '*' e
-   16  | '(' e . ')'
 
-    '+'  shift, and go to state 27
-    '*'  shift, and go to state 28
-    ')'  shift, and go to state 30
+Stan 27
 
+   15 statement: ID T_ASSIGN • e
 
-State 27
+    ID   przesunięcie, i przejście do stanu 31
+    '('  przesunięcie, i przejście do stanu 32
+    '-'  przesunięcie, i przejście do stanu 33
 
-   13 e: e '+' . e
+    e  przejście do stanu 34
 
-    ID   shift, and go to state 14
-    '-'  shift, and go to state 15
-    '('  shift, and go to state 16
 
-    e  go to state 31
+Stan 28
 
+   10 compound_statement: T_BEGIN optional_statements T_END • '.'
 
-State 28
+    '.'  przesunięcie, i przejście do stanu 35
 
-   14 e: e '*' . e
 
-    ID   shift, and go to state 14
-    '-'  shift, and go to state 15
-    '('  shift, and go to state 16
+Stan 29
 
-    e  go to state 32
+   14 statement_list: statement_list ';' • statement
 
+    ID  przesunięcie, i przejście do stanu 20
 
-State 29
+    statement  przejście do stanu 36
 
-    6 list: ',' ID list .
 
-    $default  reduce using rule 6 (list)
+Stan 30
 
+    6 declarations: declarations T_VAR identifier_list ':' type ';' •
 
-State 30
+    $domyślnie  redukcja przy użyciu reguły 6 (declarations)
 
-   16 e: '(' e ')' .
 
-    $default  reduce using rule 16 (e)
+Stan 31
 
+   20 e: ID •
 
-State 31
+    $domyślnie  redukcja przy użyciu reguły 20 (e)
 
-   13 e: e . '+' e
-   13  | e '+' e .
-   14  | e . '*' e
 
-    '+'  shift, and go to state 27
-    '*'  shift, and go to state 28
+Stan 32
 
-    '+'       [reduce using rule 13 (e)]
-    '*'       [reduce using rule 13 (e)]
-    $default  reduce using rule 13 (e)
+   19 e: '(' • e ')'
 
+    ID   przesunięcie, i przejście do stanu 31
+    '('  przesunięcie, i przejście do stanu 32
+    '-'  przesunięcie, i przejście do stanu 33
 
-State 32
+    e  przejście do stanu 37
 
-   13 e: e . '+' e
-   14  | e . '*' e
-   14  | e '*' e .
 
-    '+'  shift, and go to state 27
-    '*'  shift, and go to state 28
+Stan 33
 
-    '+'       [reduce using rule 14 (e)]
-    '*'       [reduce using rule 14 (e)]
-    $default  reduce using rule 14 (e)
+   18 e: '-' • e
+
+    ID   przesunięcie, i przejście do stanu 31
+    '('  przesunięcie, i przejście do stanu 32
+    '-'  przesunięcie, i przejście do stanu 33
+
+    e  przejście do stanu 38
+
+
+Stan 34
+
+   15 statement: ID T_ASSIGN e •
+   16 e: e • '+' e
+   17  | e • '*' e
+
+    '+'  przesunięcie, i przejście do stanu 39
+    '*'  przesunięcie, i przejście do stanu 40
+
+    $domyślnie  redukcja przy użyciu reguły 15 (statement)
+
+
+Stan 35
+
+   10 compound_statement: T_BEGIN optional_statements T_END '.' •
+
+    $domyślnie  redukcja przy użyciu reguły 10 (compound_statement)
+
+
+Stan 36
+
+   14 statement_list: statement_list ';' statement •
+
+    $domyślnie  redukcja przy użyciu reguły 14 (statement_list)
+
+
+Stan 37
+
+   16 e: e • '+' e
+   17  | e • '*' e
+   19  | '(' e • ')'
+
+    ')'  przesunięcie, i przejście do stanu 41
+    '+'  przesunięcie, i przejście do stanu 39
+    '*'  przesunięcie, i przejście do stanu 40
+
+
+Stan 38
+
+   16 e: e • '+' e
+   17  | e • '*' e
+   18  | '-' e •
+
+    '+'  przesunięcie, i przejście do stanu 39
+    '*'  przesunięcie, i przejście do stanu 40
+
+    '+'         [redukcja przy użyciu reguły 18 (e)]
+    '*'         [redukcja przy użyciu reguły 18 (e)]
+    $domyślnie  redukcja przy użyciu reguły 18 (e)
+
+
+Stan 39
+
+   16 e: e '+' • e
+
+    ID   przesunięcie, i przejście do stanu 31
+    '('  przesunięcie, i przejście do stanu 32
+    '-'  przesunięcie, i przejście do stanu 33
+
+    e  przejście do stanu 42
+
+
+Stan 40
+
+   17 e: e '*' • e
+
+    ID   przesunięcie, i przejście do stanu 31
+    '('  przesunięcie, i przejście do stanu 32
+    '-'  przesunięcie, i przejście do stanu 33
+
+    e  przejście do stanu 43
+
+
+Stan 41
+
+   19 e: '(' e ')' •
+
+    $domyślnie  redukcja przy użyciu reguły 19 (e)
+
+
+Stan 42
+
+   16 e: e • '+' e
+   16  | e '+' e •
+   17  | e • '*' e
+
+    '+'  przesunięcie, i przejście do stanu 39
+    '*'  przesunięcie, i przejście do stanu 40
+
+    '+'         [redukcja przy użyciu reguły 16 (e)]
+    '*'         [redukcja przy użyciu reguły 16 (e)]
+    $domyślnie  redukcja przy użyciu reguły 16 (e)
+
+
+Stan 43
+
+   16 e: e • '+' e
+   17  | e • '*' e
+   17  | e '*' e •
+
+    '+'  przesunięcie, i przejście do stanu 39
+    '*'  przesunięcie, i przejście do stanu 40
+
+    '+'         [redukcja przy użyciu reguły 17 (e)]
+    '*'         [redukcja przy użyciu reguły 17 (e)]
+    $domyślnie  redukcja przy użyciu reguły 17 (e)
