@@ -76,8 +76,9 @@
 #include "global.h"
 #include "symtable.h"
 u_int32_t first_free_address = 0;
+int next_temporary = 0;
 
-#line 81 "parser.cpp"
+#line 82 "parser.cpp"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -507,8 +508,8 @@ static const yytype_int8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int8 yyrline[] =
 {
-       0,    18,    18,    19,    20,    21,    23,    29,    32,    33,
-      34,    35,    36,    37,    38,    40,    42,    44,    45
+       0,    19,    19,    20,    21,    22,    24,    30,    33,    34,
+      35,    36,    37,    38,    39,    44,    49,    52,    53
 };
 #endif
 
@@ -558,8 +559,8 @@ static const yytype_int8 yypact[] =
      means the default is an error.  */
 static const yytype_int8 yydefact[] =
 {
-       0,     0,     0,     2,     0,     5,    11,     0,     0,     0,
-       6,     1,     4,     0,    18,     0,     0,    13,     0,     9,
+       0,     0,     0,     2,     0,     0,    11,     0,     0,     0,
+       6,     1,     4,     5,    18,     0,     0,    13,     0,     9,
       10,     8,     3,     0,    12,    16,     0,     0,     0,     7,
       17,    14,    15
 };
@@ -615,7 +616,7 @@ static const yytype_int8 yyr1[] =
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
 static const yytype_int8 yyr2[] =
 {
-       0,     2,     1,     3,     2,     1,     2,     3,     2,     1,
+       0,     2,     1,     3,     2,     2,     2,     3,     2,     1,
        1,     1,     3,     3,     3,     3,     2,     3,     1
 };
 
@@ -1312,89 +1313,96 @@ yyreduce:
   switch (yyn)
     {
   case 2:
-#line 18 "parser.y"
-            {for(int i=0;i<symtable.size();i++) cout << symtable[i].name<< " " <<symtable[i].type << " " << symtable[i].address <<endl;}
-#line 1318 "parser.cpp"
+#line 19 "parser.y"
+            {for(int i=0;i<symtable.size();i++) cout << symtable[i].name<< " " <<symtable[i].type << " " << symtable[i].address << " " << symtable[i].value <<endl;}
+#line 1319 "parser.cpp"
     break;
 
   case 6:
-#line 23 "parser.y"
+#line 24 "parser.y"
               {symtable[yyvsp[-1]].type=(vartype)yyvsp[0]; symtable[yyvsp[-1]].address= first_free_address;
 if( yyvsp[0] == integer) first_free_address+=4;
 else if (yyvsp[0] == real) first_free_address+=8;
 else cout << "error";
 
 }
-#line 1329 "parser.cpp"
+#line 1330 "parser.cpp"
     break;
 
   case 7:
-#line 29 "parser.y"
+#line 30 "parser.y"
                   {yyval = yyvsp[0]; symtable[yyvsp[-1]].type=(vartype)yyvsp[0]; symtable[yyvsp[-1]].address= first_free_address;
 if( yyvsp[0] == integer) first_free_address+=4;
 else if (yyvsp[0]== real) first_free_address+=8;}
-#line 1337 "parser.cpp"
+#line 1338 "parser.cpp"
     break;
 
   case 8:
-#line 32 "parser.y"
+#line 33 "parser.y"
                 {yyval=yyvsp[0];}
-#line 1343 "parser.cpp"
+#line 1344 "parser.cpp"
     break;
 
   case 9:
-#line 33 "parser.y"
+#line 34 "parser.y"
                 {yyval = integer;}
-#line 1349 "parser.cpp"
+#line 1350 "parser.cpp"
     break;
 
   case 10:
-#line 34 "parser.y"
+#line 35 "parser.y"
                {yyval = real;}
-#line 1355 "parser.cpp"
+#line 1356 "parser.cpp"
     break;
 
   case 13:
-#line 37 "parser.y"
+#line 38 "parser.y"
                  {emit("id.place ':=' E.place");}
-#line 1361 "parser.cpp"
+#line 1362 "parser.cpp"
     break;
 
   case 14:
-#line 38 "parser.y"
+#line 39 "parser.y"
            {/*E.place = newtemp; */
-            emit("id.place ':=' E1.place '+' E2.place");}
-#line 1368 "parser.cpp"
+              int newtemp = addtotable("$t",inputtype::temporary);
+               symtable[newtemp].value = symtable[yyvsp[-2]].value + symtable[yyvsp[0]].value;
+                emit("id.place ':=' E1.place '+' E2.place");
+                }
+#line 1372 "parser.cpp"
     break;
 
   case 15:
-#line 40 "parser.y"
+#line 44 "parser.y"
               {/*E.place = newtemp; */
-                emit("id.place ':=' E1.place '*' E2.place");}
-#line 1375 "parser.cpp"
-    break;
-
-  case 16:
-#line 42 "parser.y"
-            {/*E.place = newtemp; */
-                emit("id.place 'uminus' E1.place");}
+              int newtemp = addtotable("$t",inputtype::temporary);
+               symtable[newtemp].value = symtable[yyvsp[-2]].value * symtable[yyvsp[0]].value;
+                emit("id.place ':=' E1.place '*' E2.place");
+                }
 #line 1382 "parser.cpp"
     break;
 
+  case 16:
+#line 49 "parser.y"
+            {/*E.place = newtemp; */
+              int newtemp = addtotable("$t",inputtype::temporary);
+                emit("id.place 'uminus' E1.place");}
+#line 1390 "parser.cpp"
+    break;
+
   case 17:
-#line 44 "parser.y"
+#line 52 "parser.y"
                 {emit("();");/*E.place = E1.place; */}
-#line 1388 "parser.cpp"
+#line 1396 "parser.cpp"
     break;
 
   case 18:
-#line 45 "parser.y"
+#line 53 "parser.y"
           {emit("id");/*E.place:=id.place;*/}
-#line 1394 "parser.cpp"
+#line 1402 "parser.cpp"
     break;
 
 
-#line 1398 "parser.cpp"
+#line 1406 "parser.cpp"
 
       default: break;
     }
@@ -1626,7 +1634,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 49 "parser.y"
+#line 57 "parser.y"
 
 void yyerror(char const *s) {
   printf("%s\n",s);
@@ -1642,17 +1650,33 @@ int main(){
 
 symtable_t symtable;
 
-int addtotable(const string& s)
-{
-int i;
-for(i=0;i<symtable.size();i++)
-  if(symtable[i].name==s)
-    return i;
-entry d;
-d.name=s;
-d.type=none;
-symtable.push_back(d);
-return i;
+int addtotable(const string& s, inputtype input_type) {
+if (findintable(s) == -1) {
+
+entry new_entry;
+    switch(input_type) {
+      case inputtype::identifier:
+            new_entry.name = s;
+            new_entry.address = 0;
+            //new_entry.value = -1;
+            symtable.push_back(new_entry);
+            return symtable.size() - 1;
+            break;
+      case inputtype::temporary:
+            new_entry.name = s +to_string(next_temporary);
+            next_temporary +=1;
+            new_entry.address = first_free_address;
+            first_free_address +=4;
+            new_entry.value = -1;
+            new_entry.type = integer;
+            symtable.push_back(new_entry);
+            return symtable.size() - 1;
+            break;
+    }
+    return -1;
+}
+else findintable(s);
+return -2;
 };
 
 int findintable(const string& s)

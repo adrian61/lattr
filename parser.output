@@ -11,7 +11,7 @@ Grammar
 
     2 prog: decl ';' prog
     3     | decl ';'
-    4     | opt_s
+    4     | opt_s ';'
 
     5 decl: ID list
 
@@ -43,7 +43,7 @@ Terminals, with rules where they appear
     ',' (44) 6
     '-' (45) 15
     ':' (58) 7
-    ';' (59) 2 3 11
+    ';' (59) 2 3 4 11
     error (256)
     T_INTEGER (258) 8
     T_REAL (259) 9
@@ -130,12 +130,10 @@ State 4
 
 State 5
 
-    4 prog: opt_s .
+    4 prog: opt_s . ';'
    11 opt_s: opt_s . ';' s
 
     ';'  shift, and go to state 13
-
-    $default  reduce using rule 4 (prog)
 
 
 State 6
@@ -204,9 +202,12 @@ State 12
 
 State 13
 
+    4 prog: opt_s ';' .
    11 opt_s: opt_s ';' . s
 
     ID  shift, and go to state 23
+
+    $default  reduce using rule 4 (prog)
 
     s  go to state 24
 

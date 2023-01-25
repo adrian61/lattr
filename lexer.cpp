@@ -760,7 +760,7 @@ YY_RULE_SETUP
 case 5:
 YY_RULE_SETUP
 #line 16 "lexer.l"
-{yylval=addtotable(string(yytext,yyleng));return ID;}
+{yylval=addtotable(string(yytext,yyleng), inputtype::identifier);return ID;}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
