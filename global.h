@@ -5,4 +5,5 @@ using namespace std;
 int yylex();
 int yylex_destroy();
 void yyerror(char const *);
-void emit(string);
+void emit(char const *s);
+void gencode(string, int, int,int);

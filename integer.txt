@@ -1,0 +1,16 @@
+program ints(input,output);
+var a,b,c,d: integer;
+begin
+	a:=100;
+    b:=20;
+    c:=10;
+    d:=(a-b)/c + 4;
+    write(d);
+    d:=a+b/(b-c);
+    write(d);
+    d:=(a mod b);
+    write(d);
+    d:=(a div b);
+    write(d)
+end.
+

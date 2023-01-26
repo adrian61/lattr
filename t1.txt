@@ -1,7 +1,6 @@
 program example(input, output);
 var x, y: integer;
 begin
-x:= y*x; 
-a:= a100;
-b:= d;
+x:=1;
+y:=2;
 end.

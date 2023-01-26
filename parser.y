@@ -7,6 +7,7 @@
 #include "global.h"
 #include "symtable.h"
 #include <fstream>
+#define YYERROR_VERBOSE 1
 u_int32_t first_free_address = 0;
 int next_temporary = 0;
 ofstream file;
@@ -14,90 +15,138 @@ vector <int> id_vector;
 int lineno = 1;
 %}
 
-%token T_INTEGER
-%token T_REAL
-%token ID
-%token T_ASSIGN
 %token T_PROGRAM
 %token T_VAR
 %token T_BEGIN
 %token T_END
+%token T_WRITE
+%token T_ASSIGN
+%token T_INTEGER
+%token T_REAL
+%token ID
+%token NUM
+
 
 %%
 start: program { file << "exit";
                  file.close();
+                 printtable();
                }
-program:   T_PROGRAM ID '(' identifier_list ')' ';'
+program:   T_PROGRAM ID '(' program_identifier_list ')' ';'
         declarations {
                       file.open("output.asm");
                       file << "jump.i #lab0" << endl << "lab0:"<< endl;
                      }
         compound_statement
 
+program_identifier_list: ID | program_identifier_list ',' ID
+
 identifier_list: ID { id_vector.push_back($1);
-                      cout << $1 << endl;
                      }
-               | identifier_list ',' ID {id_vector.push_back($3); cout << $3 << endl;}
+               | identifier_list ',' ID {id_vector.push_back($3); }
 
 declarations: declarations T_VAR identifier_list ':' type ';' {
-                                                                for(int i=0; i< (int) id_vector.size(); i++)
-                                                                {
-                                                                  
-                                                                  if($5 == integer)
-                                                                    first_free_address += 4;
-                                                                    symtable[id_vector[i]].type = integer;
-                                                                    symtable[id_vector[i]].address = first_free_address;
-                                                                  if($5 == real)
-                                                                    first_free_address += 8;
-                                                                    symtable[id_vector[i]].type = real;
-                                                                    symtable[id_vector[i]].address = first_free_address;
+                                                                for(int i=0; i< (int) id_vector.size(); i++) {
+                                                                 symtable[id_vector[i]].type=static_cast<vartype>($5);
+                                                                 symtable[id_vector[i]].address = first_free_address;
+                                                                 if (static_cast<vartype>($5) == integer){
+                                                                 first_free_address+=4;}
+                                                                 if (static_cast<vartype>($5) == real){
+                                                                 first_free_address+=8;}
                                                                 }
                                                                  id_vector.clear();
                                                               }
-              | /* epsilon/empty */ {}
-type: T_INTEGER {$$ = integer;}
+              | /* epsilon/empty */
+type: T_INTEGER {$$ = integer; }
       | T_REAL {$$ = real;}
 
-compound_statement : T_BEGIN optional_statements T_END '.'
-
-optional_statements : statement_list
-                      |
-
-statement_list : statement
-                | statement_list ';' statement
+compound_statement : T_BEGIN optional_statements T_END '.' {}
 
 
-statement: ID T_ASSIGN e {emit("id.place ':=' E.place");}
-e: e '+' e {/*E.place = newtemp; */
-              int newtemp = addtotable("$t",inputtype::temporary);
-               symtable[newtemp].value = symtable[$1].value + symtable[$3].value;
-                emit("id.place ':=' E1.place '+' E2.place");
+optional_statements : statement
+                | optional_statements ';' statement
+
+
+statement: ID T_ASSIGN expression {
+                          //emit("id.place ':=' E.place");
+                          // $1 = $3
+                          gencode("mov", $3, $1, -1);
+                          }
+           | T_WRITE '(' identifier_list ')' {
+                                  for(int i=0; i< (int) id_vector.size(); i++)
+                                  gencode("write", id_vector[i], -1, -1);
+                                  id_vector.clear();
+                               }
+expression: expression '+' expression {/*E.place = newtemp; */
+                int newtemp = addtotable("$t",inputtype::temporary);
+                // symtable[newtemp].value = symtable[$1].value + symtable[$3].value;
+                // emit("id.place ':=' E1.place '+' E2.place");
+                $$ = newtemp;
+                gencode("add", $1, $3, newtemp);
+
                 }
-    | e '*' e {/*E.place = newtemp; */
-              int newtemp = addtotable("$t",inputtype::temporary);
-               symtable[newtemp].value = symtable[$1].value * symtable[$3].value;
-                emit("id.place ':=' E1.place '*' E2.place");
+    | expression '*' expression {/*E.place = newtemp; */
+                int newtemp = addtotable("$t",inputtype::temporary);
+                // symtable[newtemp].value = symtable[$1].value * symtable[$3].value;
+                // emit("id.place ':=' E1.place '*' E2.place");
+                $$ = newtemp;
+                gencode("mul", $1, $3, newtemp);
                 }
-    | '-' e {/*E.place = newtemp; */
-              int newtemp = addtotable("$t",inputtype::temporary);
-                emit("id.place 'uminus' E1.place");}
-    | '(' e ')' {emit("();");/*E.place = E1.place; */}
-    | ID  {emit("id");/*E.place:=id.place;*/}
+    | expression '-' expression {/*E.place = newtemp; */
+                int newtemp = addtotable("$t",inputtype::temporary);
+                // symtable[newtemp].value = symtable[$1].value * symtable[$3].value;
+                // emit("id.place ':=' E1.place '*' E2.place");
+                $$ = newtemp;
+                gencode("sub", $1, $3, newtemp);
+                }
+    | '-' expression {/*E.place = newtemp; */
+                      //emit("id.place 'uminus' E1.place");
+                            int newtemp = addtotable("$t",inputtype::temporary);
+                            int zerotemp = addtotable("0", inputtype::number);
+                            symtable[zerotemp].value = 0;
+                            symtable[zerotemp].type = integer;
+                            $$ = newtemp;
+                            gencode("sub", zerotemp, $2, newtemp);
+                            }
+    | '(' expression ')' {/*E.place = E1.place; */ $$=$2;}
+    | ID  {/*E.place:=id.place;*/
+            $$ = $1;}
+    | NUM { $$ = $1;}
 
 
 
 %%
 void yyerror(char const *s) {
   printf("%d, %s\n", lineno, s);
+  printtable();
+  yylex_destroy();
+  exit(1);
 };
 
-void emit(string s){
-cout << s << endl;
+void emit(char const *s){
+printf("%d, %s\n", lineno, s);
 }
 
 int main(){
   yyparse();
+  yylex_destroy();
+  exit(0);
 };
+
+void gencode(string mnemonic, int i1, int i2, int i3) //przekazuje indeksy w tablicy symboli
+{
+
+  string var1 = "", var2 = "", var3 = "";
+  if(i1 >= 0)
+    var1 = isdigit(symtable[i1].name[0]) ? "#" + symtable[i1].name : to_string(symtable[i1].address);
+  if(i2 >= 0)
+   var2 = isdigit(symtable[i2].name[0]) ? ",#" + symtable[i2].name : "," + to_string(symtable[i2].address);
+  if(i3 >= 0)
+   var3 = isdigit(symtable[i3].name[0]) ? ",#" + symtable[i3].name : "," + to_string(symtable[i3].address);
+  string type_postfix = symtable[i1].type == integer ? ".i " : ".r ";
+  
+  file << mnemonic+type_postfix << var1 << var2 << var3 <<  "\t\t\t\t\t;"<< mnemonic+type_postfix << symtable[i1].name << symtable[i2].name << symtable[i3].name << endl;
+}
 
 symtable_t symtable;
 
@@ -109,15 +158,23 @@ entry new_entry;
       case inputtype::identifier:
             new_entry.name = s;
             new_entry.address = 0;
-            // new_entry.value = -1;
+            new_entry.value = -1;
+            new_entry.type = none;
+            symtable.push_back(new_entry);
+            return symtable.size() - 1;
+            break;
+      case inputtype::number:
+            new_entry.name = s;
+            new_entry.value = stoi(s);
+            new_entry.type = integer;
             symtable.push_back(new_entry);
             return symtable.size() - 1;
             break;
       case inputtype::temporary:
-            new_entry.name = s +to_string(next_temporary);
+            new_entry.name = s + to_string(next_temporary);
             next_temporary +=1;
             new_entry.address = first_free_address;
-            first_free_address +=4;
+            first_free_address += 4;
             new_entry.value = -1;
             new_entry.type = integer;
             symtable.push_back(new_entry);
@@ -126,7 +183,7 @@ entry new_entry;
     }
     return -1;
 }
-else findintable(s);
+else  return findintable(s);
 return -2;
 };
 
@@ -139,4 +196,30 @@ for(i=0;i<symtable.size();i++)
 return -1;
 };
 
+void printtable(){
+    string column_names[4] = {"Name", "Type", "Value", "Address"};
+    for(int i=0; i<4; i++)
+        cout << "|" << column_names[i] << "\t";
+    
+    cout << "\n" + string(30,'-') << endl;
+    for(int i=0; i < (int)symtable.size(); i++) {
+        string value, type, address;
+        if (symtable[i].type == 0) type = "none";
+        else if (symtable[i].type == 1) type = "int";
+        else if (symtable[i].type == 2) type = "real";
+        if (symtable[i].value == -1 )
+            value = "-";
+        else
+            value = to_string(symtable[i].value);
+
+        if (symtable[i].address == -1 )
+            address = "-";
+        else
+            address = to_string(symtable[i].address   );
+
+
+        cout << "|" << symtable[i].name << "\t|" << type << "\t|" << value << "\t|" << address << endl;
+    }
+    cout<<endl<<endl<<endl;
+}
 
