@@ -65,7 +65,7 @@ compound_statement : T_BEGIN optional_statements T_END '.' {}
 
 optional_statements : statement
                 | optional_statements ';' statement
-                
+
 statement: ID T_ASSIGN expression {//emit("id.place ':=' E.place");
                                   // $1 = $3
                                   gencode("mov", $3, $1, -1);
@@ -140,31 +140,16 @@ int main(){
   exit(0);
 };
 
-void gencode(string mnemonic, int i1, int i2, int i3) //przekazuje indeksy w tablicy symboli
-{
-
-  string var1 = "", var2 = "", var3 = "", postfix ="";
+void gencode(string mnemonic, int i1, int i2, int i3) { //przekazuje indeksy w tablicy symboli
+  string var1 = "", var2 = "", var3 = "";
   if(i1 >= 0)
-    if (isdigit(symtable[i1].name[0])) {
-      var1 = "#" + symtable[i1].name;
-    }
-    else var1 = to_string(symtable[i1].address);
+    var1 = isdigit(symtable[i1].name[0]) ? "#" + symtable[i1].name : to_string(symtable[i1].address);
   if(i2 >= 0)
-   if (isdigit(symtable[i2].name[0])) {
-      var1 = "#" + symtable[i2].name;
-    }
-    else var1 = to_string(symtable[i2].address);
+   var2 = isdigit(symtable[i2].name[0]) ? ",#" + symtable[i2].name : "," + to_string(symtable[i2].address);
   if(i3 >= 0)
-   if (isdigit(symtable[i3].name[0])) {
-      var1 = "#" + symtable[i3].name;
-    }
-    else var1 = to_string(symtable[i3].address);
-
-  if (symtable[i1].type == integer) {
-      postfix = ".i ";
-    }
-    else postfix = ".r ";
-  
+   var3 = isdigit(symtable[i3].name[0]) ? ",#" + symtable[i3].name : "," + to_string(symtable[i3].address);
+  string postfix = symtable[i1].type == integer ? ".i " : ".r ";
+    
   file << mnemonic + postfix << var1 << var2 << var3 << endl;
 }
 
