@@ -1,5 +1,6 @@
 program ints(input,output);
-var a,b,c,d: integer;
+var a,b,c: integer;
+var d: integer;
 begin
 	a:=100;
     b:=20;

@@ -1,7 +1,7 @@
 %{
 #include "symtable.h"
 #include "parser.hpp"
-extern int lineno;
+extern int lineno; //zmienna zdefiniowana w innym miejscu
 %}
 
 %option noyywrap
@@ -12,7 +12,7 @@ NUM  [0-9]+
 
 %%
 [ \t\r] {}
-[\n]    {lineno++;}
+[\n]    {lineno++;} /* nowa linia - do obslugi bledow */
 begin   { return T_BEGIN; }
 end     { return T_END; }
 program { return T_PROGRAM; }
@@ -24,8 +24,10 @@ real	{ return T_REAL; }
 "/"|div { return T_DIV; }
 
 mod|"%" { return T_MOD;}
-{ID}	{ yylval=addtotable(string(yytext,yyleng), inputtype::identifier); return ID;}
-{NUM}   {yylval=addtotable(string(yytext,yyleng), inputtype::number); return NUM;}
-.	    { return yytext[0]; }
+{ID}	{ yylval=addtotable(yytext, inputtype::identifier); return ID;} /* id yylval= value associated with token*/
+{NUM}   {yylval=addtotable(yytext, inputtype::number); return NUM;} /* num */
+.	    { return yytext[0]; } /* Pojedynczy nierozpoznany znak poza nowa linia. */
 
 %%
+
+/* https://www.epaperpress.com/lexandyacc/prl.html */
