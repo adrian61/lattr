@@ -21,6 +21,9 @@ var     { return T_VAR; }
 integer	{ return T_INTEGER; }
 real	{ return T_REAL; }
 ":="    { return T_ASSIGN; }
+"/"|div { return T_DIV; }
+
+mod|"%" { return T_MOD;}
 {ID}	{ yylval=addtotable(string(yytext,yyleng), inputtype::identifier); return ID;}
 {NUM}   {yylval=addtotable(string(yytext,yyleng), inputtype::number); return NUM;}
 .	    { return yytext[0]; }

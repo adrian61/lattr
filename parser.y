@@ -7,7 +7,6 @@
 #include "global.h"
 #include "symtable.h"
 #include <fstream>
-#define YYERROR_VERBOSE 1
 u_int32_t first_free_address = 0;
 int next_temporary = 0;
 ofstream file;
@@ -25,7 +24,8 @@ int lineno = 1;
 %token T_REAL
 %token ID
 %token NUM
-
+%token T_DIV
+%token T_MOD
 
 %%
 start: program { file << "exit";
@@ -41,9 +41,8 @@ program:   T_PROGRAM ID '(' program_identifier_list ')' ';'
 
 program_identifier_list: ID | program_identifier_list ',' ID
 
-identifier_list: ID { id_vector.push_back($1);
-                     }
-               | identifier_list ',' ID {id_vector.push_back($3); }
+identifier_list: ID { id_vector.push_back($1);                  }
+               | identifier_list ',' ID {id_vector.push_back($3);}
 
 declarations: declarations T_VAR identifier_list ':' type ';' {
                                                                 for(int i=0; i< (int) id_vector.size(); i++) {
@@ -91,6 +90,20 @@ expression: expression '+' expression {/*E.place = newtemp; */
                 // emit("id.place ':=' E1.place '*' E2.place");
                 $$ = newtemp;
                 gencode("mul", $1, $3, newtemp);
+                }
+    | expression T_DIV expression {/*E.place = newtemp; */
+                int newtemp = addtotable("$t",inputtype::temporary);
+                // symtable[newtemp].value = symtable[$1].value / symtable[$3].value;
+                // emit("id.place ':=' E1.place '*' E2.place");
+                $$ = newtemp;
+                gencode("div", $1, $3, newtemp);
+                }
+    | expression T_MOD expression {/*E.place = newtemp; */
+                int newtemp = addtotable("$t",inputtype::temporary);
+                // symtable[newtemp].value = symtable[$1].value / symtable[$3].value;
+                // emit("id.place ':=' E1.place '*' E2.place");
+                $$ = newtemp;
+                gencode("mod", $1, $3, newtemp);
                 }
     | expression '-' expression {/*E.place = newtemp; */
                 int newtemp = addtotable("$t",inputtype::temporary);
@@ -145,7 +158,7 @@ void gencode(string mnemonic, int i1, int i2, int i3) //przekazuje indeksy w tab
    var3 = isdigit(symtable[i3].name[0]) ? ",#" + symtable[i3].name : "," + to_string(symtable[i3].address);
   string type_postfix = symtable[i1].type == integer ? ".i " : ".r ";
   
-  file << mnemonic+type_postfix << var1 << var2 << var3 <<  "\t\t\t\t\t;"<< mnemonic+type_postfix << symtable[i1].name << symtable[i2].name << symtable[i3].name << endl;
+  file << mnemonic+type_postfix << var1 << var2 << var3 << endl;
 }
 
 symtable_t symtable;

@@ -63,7 +63,9 @@ extern int yydebug;
     T_INTEGER = 264,               /* T_INTEGER  */
     T_REAL = 265,                  /* T_REAL  */
     ID = 266,                      /* ID  */
-    NUM = 267                      /* NUM  */
+    NUM = 267,                     /* NUM  */
+    T_DIV = 268,                   /* T_DIV  */
+    T_MOD = 269                    /* T_MOD  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
